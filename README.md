@@ -27,30 +27,26 @@ The apps already default to `http://localhost:4000` in their `.env.local`, so st
 The API runs as the `kharis-web-backend` Worker (`src/worker.js`, `wrangler.jsonc`) at
 `https://kharis-web-backend.itadmin-a94.workers.dev`.
 
-`.github/workflows/deploy.yml` runs the tests on every push and pull request, and on
-push to `main` deploys with `wrangler deploy` and checks `/health` and
-`/v1/site/branches` answer.
+Cloudflare Workers Builds is connected to this repository and deploys every push to
+`main`. `.github/workflows/deploy.yml` runs the tests on every push and pull request.
 
 One-time setup:
 
-1. Add a `CLOUDFLARE_API_TOKEN` repository secret in GitHub (Settings > Secrets and
-   variables > Actions). Create the token in Cloudflare with the "Edit Cloudflare
-   Workers" template.
-2. Set the Worker secrets once. Deploys don't touch them:
-
-   ```sh
-   npx wrangler secret put SUPABASE_URL
-   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
-   npx wrangler secret put SUPABASE_ANON_KEY
-   ```
-
-3. Point the apps at the Worker: set the `NEXT_PUBLIC_KHARIS_API_URL` repository
+1. Cloudflare dashboard > Workers & Pages > Create application > Import a repository,
+   and pick this repository. Project name `kharis-web-backend` (must match
+   `wrangler.jsonc`), build command empty, deploy command `npx wrangler deploy`,
+   root directory `/`.
+2. In the Worker's Settings > Variables and Secrets, add `SUPABASE_URL`,
+   `SUPABASE_SERVICE_ROLE_KEY` and `SUPABASE_ANON_KEY` as type Secret. Deploys keep them.
+3. Check `/health` and `/v1/site/branches` answer.
+4. Point the apps at the Worker: set the `NEXT_PUBLIC_KHARIS_API_URL` repository
    variable in `kharis-website` and redeploy the three apps (the value is baked in at
    build time).
 
-`CORS_ORIGINS` and `STUDIO_URL` are plain vars in `wrangler.jsonc`. To serve the API
-on `api.kharis.org`, uncomment the custom domain in `wrangler.jsonc`, deploy, then
-update `NEXT_PUBLIC_KHARIS_API_URL` and the smoke-test `API_URL` in the workflow.
+`CORS_ORIGINS` and `STUDIO_URL` are plain vars in `wrangler.jsonc`; each deploy
+overwrites dashboard copies, so change them there. To serve the API on
+`api.kharis.org`, uncomment the custom domain in `wrangler.jsonc`, push, then update
+`NEXT_PUBLIC_KHARIS_API_URL`.
 
 To run the Worker locally, copy the variables from `.env` into `.dev.vars` (ignored)
 and run `npm run dev:worker` (http://localhost:8787).
