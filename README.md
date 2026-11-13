@@ -8,7 +8,8 @@ code changes.
 The mobile app keeps using `Kharis-app-backend`. This project has none of its mobile
 routes, Firebase, push notifications or migration scripts.
 
-Interactive docs are served at `/api-docs`.
+Interactive docs are served at `/api-docs` when running under Node (`npm run dev`).
+The deployed Worker doesn't serve them.
 
 ## Run
 
@@ -20,6 +21,39 @@ npm run dev            # http://localhost:4000
 
 The apps already default to `http://localhost:4000` in their `.env.local`, so stop
 `Kharis-app-backend` (or move it to another port) while this one runs locally.
+
+## Deploy (Cloudflare Workers)
+
+The API runs as the `kharis-web-backend` Worker (`src/worker.js`, `wrangler.jsonc`) at
+`https://kharis-web-backend.itadmin-a94.workers.dev`.
+
+`.github/workflows/deploy.yml` runs the tests on every push and pull request, and on
+push to `main` deploys with `wrangler deploy` and checks `/health` and
+`/v1/site/branches` answer.
+
+One-time setup:
+
+1. Add a `CLOUDFLARE_API_TOKEN` repository secret in GitHub (Settings > Secrets and
+   variables > Actions). Create the token in Cloudflare with the "Edit Cloudflare
+   Workers" template.
+2. Set the Worker secrets once. Deploys don't touch them:
+
+   ```sh
+   npx wrangler secret put SUPABASE_URL
+   npx wrangler secret put SUPABASE_SERVICE_ROLE_KEY
+   npx wrangler secret put SUPABASE_ANON_KEY
+   ```
+
+3. Point the apps at the Worker: set the `NEXT_PUBLIC_KHARIS_API_URL` repository
+   variable in `kharis-website` and redeploy the three apps (the value is baked in at
+   build time).
+
+`CORS_ORIGINS` and `STUDIO_URL` are plain vars in `wrangler.jsonc`. To serve the API
+on `api.kharis.org`, uncomment the custom domain in `wrangler.jsonc`, deploy, then
+update `NEXT_PUBLIC_KHARIS_API_URL` and the smoke-test `API_URL` in the workflow.
+
+To run the Worker locally, copy the variables from `.env` into `.dev.vars` (ignored)
+and run `npm run dev:worker` (http://localhost:8787).
 
 ## Environment
 

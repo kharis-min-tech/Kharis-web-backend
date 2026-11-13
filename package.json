@@ -8,6 +8,8 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
+    "dev:worker": "wrangler dev",
+    "deploy": "wrangler deploy",
     "test": "node --test"
   },
   "engines": {
@@ -23,6 +25,7 @@
     "swagger-ui-express": "^5.0.1"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "nodemon": "^3.1.14",
+    "wrangler": "^4.161.0"
   }
 }

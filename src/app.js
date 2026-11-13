@@ -1,8 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import swaggerUi from 'swagger-ui-express';
 import { config } from './config.js';
-import { specs } from './config/swagger.js';
 import { HttpError } from './shared/errors/errors.js';
 import { errorResponse } from './shared/middleware/response.js';
 import healthRouter from './modules/health.js';
@@ -11,7 +9,9 @@ import siteRoutes from './modules/site/site.routes.js';
 import studioRoutes from './modules/studio/studio.routes.js';
 
 export const app = express();
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+// Filled in by src/index.js under Node; empty on Cloudflare Workers.
+export const docsRouter = express.Router();
+app.use('/api-docs', docsRouter);
 app.disable('x-powered-by');
 // Only the studio calls from a browser; the websites call from their servers.
 // Unset allows every origin.

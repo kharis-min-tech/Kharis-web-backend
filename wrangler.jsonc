@@ -1,0 +1,21 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "kharis-web-backend",
+  "main": "src/worker.js",
+  "compatibility_date": "2026-10-06",
+  // Runs Express through node:http and fills process.env from vars and secrets.
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+  },
+  // Public settings. SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY and SUPABASE_ANON_KEY
+  // are Worker secrets (`npx wrangler secret put <NAME>`), never set here.
+  "vars": {
+    "CORS_ORIGINS": "https://content.kharis.org,https://kharis-content.itadmin-a94.workers.dev",
+    "STUDIO_URL": "https://content.kharis.org",
+  },
+  // Cutover switch: uncomment to serve the API on its own subdomain. Until then
+  // `wrangler deploy` only publishes to kharis-web-backend.itadmin-a94.workers.dev.
+  // A custom domain (not a route) lets the website Workers on kharis.org call it.
+  // "routes": [{ "pattern": "api.kharis.org", "custom_domain": true }]
+}
