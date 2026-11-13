@@ -1,0 +1,8 @@
+export const BRANCHES = "branches"
+export const TESTIMONIES = "testimonies"
+export const MEDIA = "media"
+export const CONTACT_MESSAGES = "contact_messages"
+export const VISITORS = "visitors"
+export const QUIZ_RESULTS = "quiz_results"
+export const STUDIO_USERS = "studio_users"
+export const STUDIO_BRANCH_ACCESS = "studio_branch_access"
